@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import {
   PrimaryButton,
@@ -7,9 +7,10 @@ import {
 import { PinInput } from "../../components/inputs/index.js";
 import { LoadingOverlay, AlertBox } from "../../components/popups/index.js";
 import Avatar from "../../components/Avatar.js";
-import { transferAPI } from "../../apis/securedAPIs.js";
+import { transferAPI, withdrawAPI } from "../../apis/securedAPIs.js";
 import { convertToIndianWords } from "../../utils/index.js";
 import { Formik } from "formik";
+import AppContext from "../../context/AppContext.js";
 import * as yup from "yup";
 import colors from "../../global/colors.js";
 import {
@@ -34,6 +35,7 @@ const pinSchema = yup.object({
 export default function TransferPin({ navigation, route }) {
   const { details } = route.params;
 
+  const { user } = useContext(AppContext);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -52,11 +54,21 @@ export default function TransferPin({ navigation, route }) {
   const onSubmit = async (values) => {
     setLoading(true);
     Keyboard.dismiss();
-    const { status, data, error } = await transferAPI({
-      receiver_id: details.receiver_id,
-      amount: details.amount,
-      paymentPin: values.paymentPin,
-    });
+    if (details.isTransfer) {
+      var { status, data, error } = await transferAPI({
+        receiver_id: details.receiver_id,
+        amount: details.amount,
+        paymentPin: values.paymentPin,
+      });
+    } else {
+      var { status, data, error } = await withdrawAPI({
+        beneficiary: details.beneficiary,
+        accountNumber: details.accountNumber,
+        ifsc: details.ifsc,
+        amount: details.amount,
+        paymentPin: values.paymentPin,
+      });
+    }
     if (error) {
       if (status === 403) {
         setAlertTitle("Invalid payment Pin!");
@@ -104,31 +116,66 @@ export default function TransferPin({ navigation, route }) {
             >
               <View style={styles.form}>
                 <SqaureBackButton onPress={navigateBack} />
-                <Text style={styles.pageTitleText}>Sending Money</Text>
-                <View style={styles.avatar}>
-                  <Avatar
-                    display={`${details.firstName.charAt(
-                      0
-                    )}${details.lastName.charAt(0)}`}
-                    phoneNumber={details.phoneNumber}
-                    size={64}
-                  />
-                </View>
-                <Text style={styles.pageSubTitleText}>
-                  <Text style={{ color: colors.primary }}>To</Text>
-                  {` : ${details.firstName} ${details.lastName} `}
+                <Text style={styles.pageTitleText}>
+                  {details.isTransfer ? "Sending Money" : "Withdrawing Money"}
                 </Text>
-                <Text style={styles.pageSubTitleText}>
-                  <Text style={{ color: colors.primary }}>Phone Number</Text>
-                  {" : "}
-                  {details.phoneNumber}
-                </Text>
-                <Text style={styles.pageSubTitleText}>
-                  ₹{details.amount.toLocaleString("en-IN")}
-                </Text>
-                <Text style={styles.words}>
-                  Rupees {convertToIndianWords(details.amount)} Only
-                </Text>
+                {details.isTransfer ? (
+                  <>
+                    <View style={styles.avatar}>
+                      <Avatar
+                        display={`${details.firstName.charAt(
+                          0
+                        )}${details.lastName.charAt(0)}`}
+                        phoneNumber={details.phoneNumber}
+                        size={64}
+                      />
+                    </View>
+                    <Text style={styles.pageSubTitleText}>
+                      <Text style={{ color: colors.primary }}>To</Text>
+                      {` : ${details.firstName} ${details.lastName} `}
+                    </Text>
+                    <Text style={styles.pageSubTitleText}>
+                      <Text style={{ color: colors.primary }}>
+                        Phone Number
+                      </Text>
+                      {" : "}
+                      {details.phoneNumber}
+                    </Text>
+                    <Text style={styles.pageSubTitleText}>
+                      ₹{details.amount.toLocaleString("en-IN")}
+                    </Text>
+                    <Text style={styles.words}>
+                      Rupees {convertToIndianWords(details.amount)} Only
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <View style={styles.avatar}>
+                      <Avatar
+                        display="W"
+                        phoneNumber={user.phoneNumber}
+                        size={64}
+                      />
+                    </View>
+                    <Text style={styles.pageSubTitleText}>
+                      <Text style={{ color: colors.primary }}>To</Text>
+                      {` : ${details.beneficiary} `}
+                    </Text>
+                    <Text style={styles.pageSubTitleText}>
+                      <Text style={{ color: colors.primary }}>
+                        Account Number
+                      </Text>
+                      {" : "}
+                      {details.accountNumber}
+                    </Text>
+                    <Text style={styles.pageSubTitleText}>
+                      ₹{details.amount.toLocaleString("en-IN")}
+                    </Text>
+                    <Text style={styles.words}>
+                      Rupees {convertToIndianWords(details.amount)} Only
+                    </Text>
+                  </>
+                )}
                 <View style={styles.innerFormContainer}>
                   {/* Pin Input */}
                   <PinInput

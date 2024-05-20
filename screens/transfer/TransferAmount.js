@@ -77,7 +77,9 @@ export default function TransferAmount({ navigation, route }) {
   };
 
   const navigateToTransferPin = (amount) => {
-    navigation.navigate("TransferPin", { details: { ...details, amount } });
+    navigation.navigate("TransferPin", {
+      details: { ...details, amount, isTransfer: true },
+    });
   };
   const onSubmit = (values) => {
     navigateToTransferPin(+values.amount);

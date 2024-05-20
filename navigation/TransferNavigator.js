@@ -4,6 +4,7 @@ import Contact from "../screens/transfer/Contact.js";
 import TransferAmount from "../screens/transfer/TransferAmount.js";
 import TransferPin from "../screens/transfer/TransferPin.js";
 import DepositAmount from "../screens/transfer/DepositAmount.js";
+import WithdrawAmount from "../screens/transfer/WithdrawAmount.js";
 
 export default function TransferNavigator() {
   const Stack = createNativeStackNavigator();
@@ -17,6 +18,7 @@ export default function TransferNavigator() {
       <Stack.Screen name="TransferAmount" component={TransferAmount} />
       <Stack.Screen name="TransferPin" component={TransferPin} />
       <Stack.Screen name="DepositAmount" component={DepositAmount} />
+      <Stack.Screen name="WithdrawAmount" component={WithdrawAmount} />
     </Stack.Navigator>
   );
 }

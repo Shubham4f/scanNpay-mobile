@@ -30,6 +30,10 @@ export default function Home({ navigation }) {
   const navigateToDepositAmount = () => {
     navigation.navigate("TransferNavigator", { screen: "DepositAmount" });
   };
+
+  const navigateToWithdrawAmount = () => {
+    navigation.navigate("TransferNavigator", { screen: "WithdrawAmount" });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -61,7 +65,7 @@ export default function Home({ navigation }) {
             />
             <Text style={styles.buttonText}>Deposit</Text>
           </Pressable>
-          <Pressable style={styles.button}>
+          <Pressable style={styles.button} onPress={navigateToWithdrawAmount}>
             <Image
               style={styles.buttonImage}
               source={require("../assets/icons/withdraw.png")}

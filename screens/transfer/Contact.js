@@ -42,8 +42,11 @@ export default function Contact({ navigation }) {
         });
 
         if (data.length > 0) {
-          setAllContacts(data);
-          setFillteredContacts(data);
+          const validData = data.filter(
+            (element) => element.phoneNumbers !== undefined
+          );
+          setAllContacts(validData);
+          setFillteredContacts(validData);
         }
       }
       setContactsLoading(false);
