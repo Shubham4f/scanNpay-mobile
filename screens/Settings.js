@@ -7,6 +7,8 @@ import {
   StatusBar,
   Platform,
 } from "react-native";
+import { TextButton } from "../components/buttons/index.js";
+import AppContext from "../context/AppContext.js";
 import colors from "../global/colors.js";
 
 export default function Settings() {
@@ -15,6 +17,7 @@ export default function Settings() {
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
         <Text>Settings</Text>
+        <TextButton onPress={signOutSave}>Sign Out</TextButton>
         <Text>Developed By Shubham4f</Text>
       </View>
     </SafeAreaView>
